@@ -1,0 +1,37 @@
+{
+    "name": "entrega-final",
+    "version": "1.0.0",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "type": "module",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "nodemon src/app.js",
+        "test": "mocha test/adoptions.test.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "cookie-parser": "^1.4.7",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^6.17.0",
+        "mongoose": "^8.15.1",
+        "multer": "^2.0.1",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
+        "yamljs": "^0.3.0"
+    },
+    "devDependencies": {
+        "chai": "^5.2.0",
+        "mocha": "^11.6.0",
+        "sinon": "^20.0.0",
+        "supertest": "^7.1.1"
+    }
+}
