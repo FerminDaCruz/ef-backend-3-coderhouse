@@ -10,6 +10,7 @@ yarn-error.log*
 
 # dotenv
 .env
+.env.test
 
 # Runtime data
 pids
@@ -41,3 +42,4 @@ Thumbs.db
 .vscode/
 *.sublime-workspace
 *.sublime-project
+".env.test" 

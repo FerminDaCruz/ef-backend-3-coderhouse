@@ -11,6 +11,12 @@ const getAllAdoptions = async (req, res) => {
 
 const getAdoption = async (req, res) => {
     const adoptionId = req.params.aid;
+
+    if (!mongoose.Types.ObjectId.isValid(adoptionId)) {
+        return res
+            .status(400)
+            .send({ status: "error", error: "Invalid adoption ID" });
+    }
     const adoption = await adoptionsService.getBy({ _id: adoptionId });
     if (!adoption)
         return res
@@ -25,7 +31,7 @@ const createAdoption = async (req, res) => {
     if (!user)
         return res
             .status(404)
-            .send({ status: "error", error: "user Not found" });
+            .send({ status: "error", error: "User Not found" });
     const pet = await petsService.getBy({ _id: pid });
     if (!pet)
         return res
@@ -42,8 +48,29 @@ const createAdoption = async (req, res) => {
     res.send({ status: "success", message: "Pet adopted" });
 };
 
+const deleteAdoption = async (req, res) => {
+    const adoptionId = req.params.aid;
+
+    if (!mongoose.Types.ObjectId.isValid(adoptionId)) {
+        return res
+            .status(400)
+            .send({ status: "error", error: "Invalid adoption ID" });
+    }
+
+    const adoption = await adoptionsService.getBy({ _id: adoptionId });
+    if (!adoption)
+        return res
+            .status(404)
+            .send({ status: "error", error: "Adoption not found" });
+
+    await adoptionsService.delete(adoptionId);
+
+    res.send({ status: "success", message: "Adoption deleted" });
+};
+
 export default {
     createAdoption,
     getAllAdoptions,
     getAdoption,
+    deleteAdoption,
 };

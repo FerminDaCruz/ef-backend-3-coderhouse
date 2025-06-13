@@ -51,7 +51,6 @@ describe("Adoptions API", () => {
         expect(response.body.status).to.equal("success");
         expect(response.body.message).to.equal("Pet adopted");
 
-        // Guardamos el adoptionId para usarlo después
         const adoption = await adoptionModel.findOne({
             owner: user._id,
             pet: pet._id,
@@ -60,8 +59,40 @@ describe("Adoptions API", () => {
         adoptionId = adoption._id;
     });
 
+    it("POST /api/adoptions/:uid/:pid → usuario inexistente", async () => {
+        const fakeUserId = new mongoose.Types.ObjectId();
+
+        const response = await request
+            .post(`/api/adoptions/${fakeUserId}/${pet._id}`)
+            .expect(404);
+
+        expect(response.body.status).to.equal("error");
+        expect(response.body.error).to.equal("User not found");
+    });
+
+    it("POST /api/adoptions/:uid/:pid → mascota inexistente", async () => {
+        const fakePetId = new mongoose.Types.ObjectId();
+
+        const response = await request
+            .post(`/api/adoptions/${user._id}/${fakePetId}`)
+            .expect(404);
+
+        expect(response.body.status).to.equal("error");
+        expect(response.body.error).to.equal("Pet not found");
+    });
+
+    it("POST /api/adoptions/:uid/:pid → mascota ya adoptada", async () => {
+        await adoptionModel.create({ owner: user._id, pet: pet._id });
+
+        const response = await request
+            .post(`/api/adoptions/${user._id}/${pet._id}`)
+            .expect(400);
+
+        expect(response.body.status).to.equal("error");
+        expect(response.body.error).to.equal("Pet already adopted");
+    });
+
     it("GET /api/adoptions/ → debería devolver las adopciones", async () => {
-        // Primero creamos una adopción
         await adoptionModel.create({
             owner: user._id,
             pet: pet._id,
@@ -92,6 +123,39 @@ describe("Adoptions API", () => {
         const fakeId = new mongoose.Types.ObjectId();
         const response = await request
             .get(`/api/adoptions/${fakeId}`)
+            .expect(404);
+
+        expect(response.body.status).to.equal("error");
+        expect(response.body.error).to.equal("Adoption not found");
+    });
+
+    it("GET /api/adoptions/:aid → debería devolver 400 si el ID es inválido", async () => {
+        const response = await request
+            .get("/api/adoptions/invalid-id")
+            .expect(400);
+
+        expect(response.body.status).to.equal("error");
+    });
+
+    it("DELETE /api/adoptions/:aid → debería eliminar una adopción", async () => {
+        const adoption = await adoptionModel.create({
+            owner: user._id,
+            pet: pet._id,
+        });
+
+        const response = await request
+            .delete(`/api/adoptions/${adoption._id}`)
+            .expect(200);
+
+        expect(response.body.status).to.equal("success");
+        expect(response.body.message).to.equal("Adoption deleted");
+    });
+
+    it("DELETE /api/adoptions/:aid → debería devolver error si la adopción no existe", async () => {
+        const fakeId = new mongoose.Types.ObjectId();
+
+        const response = await request
+            .delete(`/api/adoptions/${fakeId}`)
             .expect(404);
 
         expect(response.body.status).to.equal("error");
